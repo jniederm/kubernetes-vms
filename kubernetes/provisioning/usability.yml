@@ -1,0 +1,26 @@
+---
+- name: Install htop
+  dnf:
+    name: htop
+    state: present
+  become: true
+- name: Is vim-minimal installed?
+  shell: 'rpm -q vim-minimal'
+  register: vim_minimal_present_result
+  changed_when: no
+- name: Update vim-minimal for it to be replaceable by vim-enhanced
+  dnf:
+    name: vim-minimal
+    state: latest
+  become: yes
+  when: vim_minimal_present_result.rc == 0
+- name: Install vim
+  dnf:
+    name: vim
+    state: present
+  become: true
+- name: Install bash-completion
+  dnf:
+    name: bash-completion
+    state: present
+  become: true

@@ -1,0 +1,62 @@
+---
+- name: Install kubernetes
+  dnf:
+    name: kubernetes
+    state: present
+  become: true
+- name: Install etcd
+  dnf:
+    name: etcd
+    state: present
+  become: true
+- name: docker service enabled
+  systemd:
+    name: docker
+    enabled: yes
+  become: true
+- name: etcd service enabled
+  systemd:
+    name: etcd
+    enabled: yes
+  become: true
+- name: kube-apiserver service enabled
+  systemd:
+    name: kube-apiserver
+    enabled: yes
+  become: true
+- name: kube-controller-manager service enabled
+  systemd:
+    name: kube-controller-manager
+    enabled: yes
+  become: true
+- name: kube-scheduler service enabled
+  systemd:
+    name: kube-scheduler
+    enabled: yes
+  become: true
+- name: kube-proxy service enabled
+  systemd:
+    name: kube-proxy
+    enabled: yes
+  become: true
+- name: kubelet service enabled
+  systemd:
+    name: kubelet
+    enabled: yes
+  become: true
+- name: Bind api server to 0.0.0.0
+  lineinfile:
+    path: /etc/kubernetes/apiserver
+    regexp: '^KUBE_API_ADDRESS='
+    line: 'KUBE_API_ADDRESS="--insecure-bind-address=0.0.0.0"'
+  become: yes
+- name: Turn apiserver admision control off
+  lineinfile:
+    path: /etc/kubernetes/apiserver
+    backrefs: yes
+    regexp: '(^KUBE_ADMISSION_CONTROL="[^"].*$)'
+    line: "#\\1\nKUBE_ADMISSION_CONTROL=\"\""
+  become: yes
+- name: Print user message
+  debug:
+    msg: Please reboot the VM to finish the provisioning by 'vagrant reload'
